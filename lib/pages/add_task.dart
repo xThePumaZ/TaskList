@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-
-import 'models/tasks_model.dart';
-import 'utilities/database_helper.dart';
+import '../utilities/database_helper.dart';
 
 class AddTask extends StatefulWidget {
-  const AddTask({super.key});
+  final VoidCallback navigateToHome;
+
+  const AddTask({super.key, required this.navigateToHome});
 
   @override
   State<AddTask> createState() => _AddTaskState();
@@ -15,10 +15,9 @@ class _AddTaskState extends State<AddTask> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
 
-  Future<void> _addTask() async {
+  void _addTask() {
     final dbHelper = DatabaseHelper();
-    await dbHelper.database;
-
+    dbHelper.database;
 
     dbHelper.insertTask(Map<String, dynamic>.from({
       'title': _titleController.text,
@@ -26,18 +25,15 @@ class _AddTaskState extends State<AddTask> {
       'isDone': false,
     }));
 
-    // dbHelper.insertTask(Tasks(
-    //   title: _titleController.text,
-    //   description: _descriptionController.text,
-    //   isDone: false
-    // ));
+    _titleController.text = '';
+    _descriptionController.text = '';
+
+    widget.navigateToHome();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.amber, title: Text("Add Task")),
-
       body: Form(
         key: _formKey,
         child: Column(
@@ -47,7 +43,11 @@ class _AddTaskState extends State<AddTask> {
               padding: EdgeInsetsGeometry.all(16),
               child: TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(hintText: "Title"),
+                decoration: const InputDecoration(
+                  hintText: "Enter a Title",
+                  labelText: "Title",
+                  filled: true,
+                ),
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
                     return "Please enter a Title";
@@ -58,12 +58,19 @@ class _AddTaskState extends State<AddTask> {
             ),
             Padding(
               padding: EdgeInsetsGeometry.all(16),
-              child: TextField(
+              child: TextFormField(
                 controller: _descriptionController,
                 decoration: InputDecoration(
-                  label: const Text("Task"),
-                  labelStyle: const TextStyle(fontSize: 20),
+                  filled: true,
+                  hintText: "Enter a Description",
+                  labelText: 'Description'
                 ),
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter a Description";
+                  }
+                  return null;
+                },
                 maxLines: 10,
               ),
             ),

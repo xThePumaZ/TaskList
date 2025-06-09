@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:task_list/models/tasks_model.dart';
 
 class DatabaseHelper {
   // Singleton instance
@@ -61,7 +60,7 @@ class DatabaseHelper {
   // Example:
   Future<int> insertTask(Map<String, dynamic> row) async {
     Database db = await database;
-    return await db.insert('tasks', row);
+    return db.insert('tasks', row);
   }
 
   Future<List<Map<String, dynamic>>> queryAllTasks() async {
@@ -70,11 +69,13 @@ class DatabaseHelper {
   }
 
   Future<int> updateTask(Map<String, dynamic> row) async {
-    throw ();
+    Database db = await database;
+    return await db.update('tasks', row, where: 'id = ?', whereArgs: [row['id']]);
   }
 
   Future<int> deleteTask(int id) async {
-    throw ();
+    Database db = await database;
+    return await db.delete('tasks', where: 'id = ?', whereArgs: [id]);
   }
 
 }
